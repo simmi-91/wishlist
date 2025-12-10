@@ -1,8 +1,7 @@
 export type AuthContextType = {
   authSession: AuthSessionPayload | null;
   isLoading: boolean;
-  setIsLoading: (arg: boolean) => void;
-  login: (payload: AuthSessionPayload) => void;
+  login: (idTokenString: string | undefined) => void;
   logout: () => void;
 };
 

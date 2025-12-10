@@ -12,8 +12,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleLogin = (payload: AuthSessionPayload) => {
-    setAuthSession(payload);
+  const handleLogin = async (idTokenString: string | undefined) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        import.meta.env.VITE_API_BASE_URL + "/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: idTokenString }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        const { token: appToken, user, expiresAt } = data;
+        const payloadToSend = {
+          token: {
+            appToken: appToken,
+            issuedAt: Date.now(),
+          },
+          user,
+          expiresAt,
+        };
+        setAuthSession(payloadToSend);
+      } else {
+        console.error("Backend Auth Error:", data.error);
+      }
+    } catch (error) {
+      console.error("Network or Fetch Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -52,7 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const contextValue = {
     authSession,
     isLoading,
-    setIsLoading,
     login: handleLogin,
     logout: handleLogout,
   };
