@@ -1,18 +1,17 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+
+import Header from "../components/layout/Header";
+
+import { Container } from "react-bootstrap";
 
 const RootLayout = () => (
   <>
-    <header>
-      <Link to="/" className="">
-        Home
-      </Link>
-      <Link to="/preview" className="">
-        preview
-      </Link>
-    </header>
-    <main className="">
-      <Outlet />
+    <main className="app-shell">
+      <Header />
+
+      <Container fluid className="content-scroll py-2">
+        <Outlet />
+      </Container>
     </main>
   </>
 );

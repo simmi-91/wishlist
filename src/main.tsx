@@ -1,31 +1,21 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "./auth/AuthProvider";
 
-const router = createRouter({
-  routeTree,
-  basepath: "/wishlist",
-});
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-import "./index.css";
-//import "bootstrap/dist/css/bootstrap.min.css";
-//import "bootstrap/dist/js/bootstrap.bundle.min.js";
-//import "bootstrap-icons/font/bootstrap-icons.min.css";
+import App from "./App";
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </StrictMode>
   );
 }
