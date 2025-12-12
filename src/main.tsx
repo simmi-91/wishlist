@@ -6,6 +6,10 @@ import { AuthProvider } from "./auth/AuthProvider";
 
 import App from "./App";
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createQueryClient } from "./queryClient";
+const queryClient = createQueryClient();
+
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = createRoot(rootElement);
@@ -13,7 +17,9 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>
         <AuthProvider>
-          <App />
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
         </AuthProvider>
       </GoogleOAuthProvider>
     </StrictMode>
