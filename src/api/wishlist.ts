@@ -19,7 +19,7 @@ export async function createWishlistItem(
 }
 
 export async function updateWishlistItem(
-  id: string,
+  id: number,
   data: Partial<NewWishlistItem>
 ): Promise<WishlistItem> {
   return client.request<WishlistItem>(`wishlist/${id}`, {
@@ -28,7 +28,7 @@ export async function updateWishlistItem(
   });
 }
 
-export async function deleteWishlistItem(id: string): Promise<void> {
+export async function deleteWishlistItem(id: number): Promise<void> {
   await client.request<void>(`wishlist/${id}`, {
     method: "DELETE",
     skipJson: true,

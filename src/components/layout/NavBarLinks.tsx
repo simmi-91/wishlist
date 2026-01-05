@@ -8,9 +8,10 @@ const NavBarLinks = () => {
       </Link>
 
       <Link to="/edit" className="nav-link">
-        Edit
+        Add & Edit
       </Link>
     </>
   );
 };
+
 export default NavBarLinks;

@@ -10,5 +10,5 @@ export type WishlistItem = {
 
 export type NewWishlistItem = Pick<
   WishlistItem,
-  "title" | "description" | "category"
+  "title" | "description" | "category" | "active"
 >;

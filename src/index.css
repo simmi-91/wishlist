@@ -18,8 +18,13 @@ body {
   flex-direction: column;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a0000 0%, #520101 50%, #290101 100%);
   overflow: hidden;
+
+  background: linear-gradient(135deg, #290101 0%, #520101 50%, #1a0000 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 main {
   flex: 1;
@@ -40,6 +45,14 @@ main > header {
 
 .bg-see-through {
   background-color: rgba(255, 255, 255, 0.6);
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+.wish-card .card-body p {
+  margin: 0;
 }
 /*
 @media (prefers-color-scheme: light) {

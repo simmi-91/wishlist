@@ -8,7 +8,12 @@ import { Container, Row, Col } from "react-bootstrap";
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { authSession, isLoading } = useAuth();
 
-  if (isLoading) return <Loading />;
+  if (isLoading)
+    return (
+      <Container className=" d-flex justify-content-center text-center">
+        <Loading text={"Loading Page…"} color={"primary"} />
+      </Container>
+    );
   if (!authSession)
     return (
       <Container>

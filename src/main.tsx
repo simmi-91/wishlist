@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./auth/AuthProvider";
+import { ToastProvider } from "./components/ToastProvider";
 
 import App from "./App";
 
@@ -18,7 +19,9 @@ if (!rootElement.innerHTML) {
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-            <App />
+            <ToastProvider>
+              <App />
+            </ToastProvider>
           </QueryClientProvider>
         </AuthProvider>
       </GoogleOAuthProvider>

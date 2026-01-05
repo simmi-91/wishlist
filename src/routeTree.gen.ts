@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as EditRouteImport } from './routes/edit'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EditNewRouteImport } from './routes/edit.new'
+import { Route as EditWishIdRouteImport } from './routes/edit.$wishId'
 
 const PreviewRoute = PreviewRouteImport.update({
   id: '/preview',
@@ -28,34 +30,50 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditNewRoute = EditNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EditRoute,
+} as any)
+const EditWishIdRoute = EditWishIdRouteImport.update({
+  id: '/$wishId',
+  path: '/$wishId',
+  getParentRoute: () => EditRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/edit': typeof EditRoute
+  '/edit': typeof EditRouteWithChildren
   '/preview': typeof PreviewRoute
+  '/edit/$wishId': typeof EditWishIdRoute
+  '/edit/new': typeof EditNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/edit': typeof EditRoute
+  '/edit': typeof EditRouteWithChildren
   '/preview': typeof PreviewRoute
+  '/edit/$wishId': typeof EditWishIdRoute
+  '/edit/new': typeof EditNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/edit': typeof EditRoute
+  '/edit': typeof EditRouteWithChildren
   '/preview': typeof PreviewRoute
+  '/edit/$wishId': typeof EditWishIdRoute
+  '/edit/new': typeof EditNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/edit' | '/preview'
+  fullPaths: '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/edit' | '/preview'
-  id: '__root__' | '/' | '/edit' | '/preview'
+  to: '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
+  id: '__root__' | '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  EditRoute: typeof EditRoute
+  EditRoute: typeof EditRouteWithChildren
   PreviewRoute: typeof PreviewRoute
 }
 
@@ -82,12 +100,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/edit/new': {
+      id: '/edit/new'
+      path: '/new'
+      fullPath: '/edit/new'
+      preLoaderRoute: typeof EditNewRouteImport
+      parentRoute: typeof EditRoute
+    }
+    '/edit/$wishId': {
+      id: '/edit/$wishId'
+      path: '/$wishId'
+      fullPath: '/edit/$wishId'
+      preLoaderRoute: typeof EditWishIdRouteImport
+      parentRoute: typeof EditRoute
+    }
   }
 }
 
+interface EditRouteChildren {
+  EditWishIdRoute: typeof EditWishIdRoute
+  EditNewRoute: typeof EditNewRoute
+}
+
+const EditRouteChildren: EditRouteChildren = {
+  EditWishIdRoute: EditWishIdRoute,
+  EditNewRoute: EditNewRoute,
+}
+
+const EditRouteWithChildren = EditRoute._addFileChildren(EditRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  EditRoute: EditRoute,
+  EditRoute: EditRouteWithChildren,
   PreviewRoute: PreviewRoute,
 }
 export const routeTree = rootRouteImport
