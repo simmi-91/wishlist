@@ -230,7 +230,6 @@ function ImageManager({ wishId, images, maxImages = 10 }: ImageManagerProps) {
                 <Button
                   variant="outline-secondary"
                   onClick={() => setUploadMode("url")}
-                  disabled={true}
                 >
                   Add from URL
                 </Button>
