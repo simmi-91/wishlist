@@ -3,6 +3,7 @@ import { ProtectedRoute } from "../auth/ProtectedRoute";
 
 import { useToasts } from "../components/toastContext";
 import type { WishlistItem } from "../types/wishlist";
+import type {WishlistImageItem} from '../types/wishlistImage.ts';
 import { useWishlist, useUpdateWishlistItem } from "../hooks/useWishlist";
 import { formatDateOnly, formatDateAndTime } from "../utils/formatDate";
 
@@ -62,9 +63,35 @@ function PreviewRoute() {
     );
   }
 
+  function topImage(item: WishlistImageItem[]) {
+    const url = item[0].url;
+    return <Card.Img variant="top" src={url} />;
+  }
+
+  function imageRow(imageItems: WishlistImageItem[]) {
+    const remainingImages = imageItems.slice(1);
+    return (
+      <Row className="g-2 p-2">
+        {remainingImages.map((item) => (
+          <Col key={item.id} xs={4}>
+            <img
+              src={item.url}
+              alt={`${item.image_type} - ${item.path}`}
+              className="img-fluid rounded"
+              style={{ objectFit: "cover", height: "100px", width: "100%" }}
+            />
+          </Col>
+        ))}
+      </Row>
+    );
+  }
+
   function giftCard(item: WishlistItem) {
     const created = formatDateOnly(item.createdAt);
     const updated = formatDateAndTime(item.updated);
+    const sortedImages = [...item.images].sort(
+      (a, b) => a.display_order - b.display_order
+    );
 
     return (
       <Col key={item.id} xs={12} md={6} lg={4}>
@@ -78,6 +105,7 @@ function PreviewRoute() {
               </Link>
             </div>
           </Card.Header>
+          {sortedImages.length > 0 ? topImage(sortedImages) : null}
           <Card.Body>
             <Card.Title>{item.title}</Card.Title>
             <Card.Text
@@ -85,6 +113,7 @@ function PreviewRoute() {
               dangerouslySetInnerHTML={{ __html: item.description }}
             />
           </Card.Body>
+          {sortedImages.length > 1 ? imageRow(sortedImages) : null}
           <Card.Footer className="text-muted">
             <small className="float-start">Created: {created}</small>
             <small className="float-end">Updated: {updated}</small>

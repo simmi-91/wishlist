@@ -16,9 +16,12 @@ async function request<T = unknown>(
     ? input
     : `${API_BASE.replace(/\/$/, "")}/${input.replace(/^\//, "")}`;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string> | undefined),
   };
+
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const token = options.token ?? tokenGetter?.();
   if (token) headers.Authorization = `Bearer ${token}`;

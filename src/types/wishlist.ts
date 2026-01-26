@@ -1,3 +1,5 @@
+import type {WishlistImageItem} from './wishlistImage.ts';
+
 export type WishlistItem = {
   id: number;
   title: string;
@@ -6,9 +8,10 @@ export type WishlistItem = {
   active: number;
   createdAt: string;
   updated: string;
+  images: WishlistImageItem[] | [];
 };
 
 export type NewWishlistItem = Pick<
   WishlistItem,
-  "title" | "description" | "category" | "active"
+  "title" | "description" | "category" | "active" | "images"
 >;

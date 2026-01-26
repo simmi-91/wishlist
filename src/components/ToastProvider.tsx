@@ -23,7 +23,7 @@ type ToastOptions = {
 
 type ToastEntry = ToastOptions & { id: number };
 
-const DEFAULT_DELAY_MS = 5_000;
+const DEFAULT_DELAY_MS = 8_000;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastEntry[]>([]);

@@ -62,30 +62,42 @@ function EditRoute() {
       key={item.id}
       to="/edit/$wishId"
       params={{ wishId: String(item.id) }}
-      className="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-center"
+      className="list-group-item list-group-item-action justify-content-between align-items-center"
     >
-      {item.active === 1 ? (
-        <Badge bg="success">Active</Badge>
-      ) : (
-        <Badge bg="secondary">inctive</Badge>
-      )}
-      <span className="px-1">{item.title}</span>
-      <Button
-        variant="dark"
-        size="sm"
-        onClick={(event: MouseEvent<HTMLButtonElement>) => {
-          event.preventDefault();
-          event.stopPropagation();
-          void handleDelete(item);
-        }}
-      >
-        Delete
-      </Button>
+      <Container fluid>
+        <Row>
+          <Col xs={1}>{item.id}.</Col>
+          <Col>{item.title}</Col>
+        </Row>
+        <Row>
+          <Col>
+            {item.active === 1 ? (
+              <Badge bg="success" className="float-start">Active</Badge>
+            ) : (
+              <Badge bg="secondary" className="float-start">inctive</Badge>
+            )}
+          </Col>
+          <Col>
+            <Button
+              className="float-end"
+              variant="dark"
+              size="sm"
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                event.preventDefault();
+                event.stopPropagation();
+                void handleDelete(item);
+              }}
+            >
+              Delete
+            </Button>
+          </Col>
+        </Row>
+      </Container>
     </Link>
   );
 
   return (
-    <Container>
+    <Container fluid>
       <Row className="text-center text-light p-2">
         <Col className="">
           <h1>Edit the wishlist</h1>

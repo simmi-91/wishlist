@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as api from "../api/wishlist";
 import type { NewWishlistItem, WishlistItem } from "../types/wishlist";
 
-const QUERY_KEY = ["wishlist"] as const;
+export const QUERY_KEY = ["wishlist"] as const;
 
 export function useWishlist() {
   return useQuery<WishlistItem[]>({

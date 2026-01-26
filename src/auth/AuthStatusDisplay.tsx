@@ -8,12 +8,12 @@ const AuthStatusDisplay = () => {
   return (
     <>
       {authSession ? (
-        <>
-          <span className="text-light px-2">{authSession.user.name}</span>
+        <span>
+          <span className="text-light pe-2">{authSession.user.name}</span>
           <Button onClick={() => logout()} size="sm">
             Log out
           </Button>
-        </>
+        </span>
       ) : (
         <GoogleLogin
           onSuccess={(credentialResponse: CredentialResponse) => {

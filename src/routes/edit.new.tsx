@@ -23,6 +23,7 @@ function NewWishRoute() {
     description: "",
     category: 0,
     active: 1,
+    images: []
   };
 
   return (

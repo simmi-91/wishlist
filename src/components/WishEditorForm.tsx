@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, startTransition } from "react";
 
 import { useToasts } from "./toastContext";
 import { usePendingChanges } from "../hooks/usePendingChanges";
 import {
+  useWishlist,
   useCreateWishlistItem,
   useUpdateWishlistItem,
 } from "../hooks/useWishlist";
 import type { WishlistItem, NewWishlistItem } from "../types/wishlist";
+import ImageManager from "./ImageManager";
 
 import { Alert, Button, Form, Row, Col } from "react-bootstrap";
 import ReactQuill from "react-quill-new";
@@ -20,8 +22,9 @@ type WishEditorFormProps = {
 function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
   const { addToast } = useToasts();
   const setHasPendingChanges = usePendingChanges(
-    (state) => state.setHasPendingChanges
+    (state) => state.setHasPendingChanges,
   );
+  const { data: wishlistData } = useWishlist();
 
   const sanitizeQuillTextForSave = (value: string) => {
     if (typeof value !== "string") return "";
@@ -30,21 +33,42 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
     return trimmed;
   };
 
+  const isExisting = "id" in wish;
+  const currentWish =
+    isExisting && wishlistData
+      ? (wishlistData.find((w) => w.id === wish.id) ?? wish)
+      : wish;
+
   const [formData, setFormData] = useState({
     title: wish.title,
     description: wish.description,
     active: wish.active ?? 0,
     category: wish.category ?? 0,
+    images: wish.images ?? [],
   });
   const [originalData, setOriginalData] = useState(formData);
+
+  const syncedImages = useMemo(() => {
+    if (isExisting && currentWish.images) {
+      return currentWish.images;
+    }
+    return formData.images;
+  }, [isExisting, currentWish.images, formData.images]);
+
+  useEffect(() => {
+    if (isExisting && syncedImages !== formData.images) {
+      startTransition(() => {
+        setFormData((prev) => ({ ...prev, images: syncedImages }));
+        setOriginalData((prev) => ({ ...prev, images: syncedImages }));
+      });
+    }
+  }, [syncedImages, isExisting, formData.images]);
 
   useEffect(() => {
     const hasChanges =
       JSON.stringify(formData) !== JSON.stringify(originalData);
     setHasPendingChanges(hasChanges);
   }, [formData, originalData, setHasPendingChanges]);
-
-  const isExisting = "id" in wish;
   const updateWish = useUpdateWishlistItem();
   const createWish = useCreateWishlistItem();
 
@@ -58,7 +82,7 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const target = e.target;
     const { name, value } = target;
@@ -107,7 +131,6 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
           message: `Created new wish with title "${formData.title}"`,
         });
       }
-
       setOriginalData(payload);
       setFormData(payload);
     } catch (err) {
@@ -130,7 +153,7 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
         {isExisting ? `Edit “${wish.title}”` : "Add new wish"}
       </h5>
 
-      <Form className="d-flex flex-column gap-3">
+      <Form className="d-flex flex-column gap-2">
         <Form.Group controlId="wishTitle">
           <Form.Label>Title</Form.Label>
           <Form.Control
@@ -211,10 +234,10 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
             {isExisting
               ? updateWish.isPending
                 ? "Saving..."
-                : "Save"
+                : "Save Wish"
               : createWish.isPending
                 ? "Creating..."
-                : "Create"}
+                : "Create Wish"}
           </Button>
           <Button variant="outline-secondary" onClick={handleCancel}>
             Cancel
@@ -229,6 +252,14 @@ function WishEditorForm({ wish, onCancel }: WishEditorFormProps) {
         )}
         {(updateWish.isSuccess || createWish.isSuccess) && (
           <Alert variant="success">Changes saved.</Alert>
+        )}
+
+        {isExisting && wish.id > 0 && (
+          <ImageManager
+            wishId={wish.id}
+            images={formData.images}
+            maxImages={5}
+          />
         )}
       </Form>
     </div>
