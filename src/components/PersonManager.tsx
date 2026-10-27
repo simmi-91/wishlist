@@ -16,6 +16,10 @@ function PersonManager() {
     const [name, setName] = useState("");
     const [isHousehold, setIsHousehold] = useState(false);
 
+    // Person whose name is being edited in the table
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editName, setEditName] = useState("");
+
     // Household first, then by name
     const sortedPersons = [...persons].sort(
         (a, b) => b.is_household - a.is_household || a.name.localeCompare(b.name, "nb")
@@ -43,6 +47,33 @@ function PersonManager() {
             });
         } catch (err) {
             addToast({ variant: "danger", title: "Oppdatering feilet", message: apiErrorMessage(err) });
+        }
+    };
+
+    const startEdit = (person: Person) => {
+        setEditingId(person.id);
+        setEditName(person.name);
+    };
+
+    const cancelEdit = () => setEditingId(null);
+
+    const saveEdit = async (person: Person) => {
+        const newName = editName.trim();
+        if (!newName) {
+            return;
+        }
+        if (newName === person.name) {
+            cancelEdit();
+            return;
+        }
+        try {
+            await updatePerson.mutateAsync({
+                id: person.id,
+                data: { name: newName, is_household: person.is_household === 1 },
+            });
+            cancelEdit();
+        } catch (err) {
+            addToast({ variant: "danger", title: "Kunne ikke lagre", message: apiErrorMessage(err) });
         }
     };
 
@@ -97,7 +128,26 @@ function PersonManager() {
                 <tbody>
                     {sortedPersons.map((person) => (
                         <tr key={person.id}>
-                            <td>{person.name}</td>
+                            <td>
+                                {editingId === person.id ? (
+                                    <Form.Control
+                                        size="sm"
+                                        autoFocus
+                                        aria-label="Nytt navn"
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                saveEdit(person);
+                                            } else if (e.key === "Escape") {
+                                                cancelEdit();
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    person.name
+                                )}
+                            </td>
                             <td>
                                 <Form.Check
                                     type="switch"
@@ -107,15 +157,49 @@ function PersonManager() {
                                     onChange={() => toggleHousehold(person)}
                                 />
                             </td>
-                            <td className="text-end">
-                                <Button
-                                    size="sm"
-                                    variant="outline-danger"
-                                    aria-label={`Slett ${person.name}`}
-                                    onClick={() => handleDelete(person)}
-                                >
-                                    <i className="bi bi-trash"></i>
-                                </Button>
+                            <td className="text-end text-nowrap">
+                                {editingId === person.id ? (
+                                    <>
+                                        <Button
+                                            size="sm"
+                                            variant="success"
+                                            aria-label="Lagre navn"
+                                            disabled={updatePerson.isPending}
+                                            onClick={() => saveEdit(person)}
+                                        >
+                                            <i className="bi bi-check-lg"></i>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline-secondary"
+                                            className="ms-1"
+                                            aria-label="Avbryt"
+                                            onClick={cancelEdit}
+                                        >
+                                            <i className="bi bi-x-lg"></i>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            size="sm"
+                                            variant="outline-light"
+                                            aria-label={`Rediger ${person.name}`}
+                                            onClick={() => startEdit(person)}
+                                        >
+                                            <i className="bi bi-pencil"></i>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline-danger"
+                                            className="ms-1"
+                                            aria-label={`Slett ${person.name}`}
+                                            onClick={() => handleDelete(person)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </Button>
+                                    </>
+                                )}
                             </td>
                         </tr>
                     ))}
