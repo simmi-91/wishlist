@@ -1,0 +1,80 @@
+name: Deploy Wishlist Panel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+concurrency: deploy-wishlist-panel
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create production environment file
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env.production
+          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}" >> .env.production
+
+      - name: Build React app
+        run: npm run build
+
+      - name: Upload to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "dist/*"
+          target: "/tmp/wishlist-deploy-client"
+          strip_components: 1 # Removes 'dist' from path
+          rm: true # Clean target directory first
+
+      - name: Execute deployment script on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            [ -d /var/www/admin/client ] || sudo mkdir -p /var/www/admin/client
+            cd /var/www/admin/client/
+
+            # Remove old backup if exists
+            if [ -d "wishlist_old" ]; then
+              sudo rm -rf wishlist_old
+              echo "Removed wishlist_old"
+            fi
+
+            # Rename current to old (if exists)
+            if [ -d "wishlist" ]; then
+              sudo mv wishlist wishlist_old
+              echo "Renamed wishlist to wishlist_old"
+            fi
+
+            # Move new build from temp location
+            sudo mv /tmp/wishlist-deploy-client wishlist
+
+            # Set proper permissions
+            sudo chown -R www-data:www-data wishlist
+            sudo chmod -R u=rwX,go=rX wishlist
+
+            echo "Client deployment complete!"
+            ls -la /var/www/admin/client/wishlist/
+
+      - name: Health check
+        run: curl -fsS -o /dev/null https://admin.3lin.no/wishlist/
