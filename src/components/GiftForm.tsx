@@ -1,5 +1,5 @@
 import { useId, useRef, useState } from "react";
-import { Button, ButtonGroup, Card, Col, Form, Row } from "react-bootstrap";
+import { Button, ButtonGroup, Col, Form, Row } from "react-bootstrap";
 
 import { useToasts } from "./toastContext";
 import PersonPicker, { type PersonRef } from "./PersonPicker";
@@ -291,206 +291,204 @@ function GiftForm() {
     };
 
     return (
-        <Card>
-            <Card.Body>
-                {/* On mobile the Christmas switch sits above the quick choices */}
-                <div className="d-flex flex-column flex-md-row flex-md-wrap align-items-start align-items-md-center gap-2 mb-3">
-                    {household.length === 0 ? (
-                        <small className="text-body-secondary">
-                            Marker deg selv og samboeren som husstand under «Rediger personer» nederst for å få hurtigvalg.
-                        </small>
-                    ) : (
-                        <ButtonGroup className="quick-choices">
-                            {quickChoices.map((choice) => (
-                                <Button
-                                    key={choice.label}
-                                    variant={isActive(choice) ? "primary" : "outline-primary"}
-                                    onClick={() => applyChoice(choice)}
-                                >
-                                    {choice.label}
-                                </Button>
-                            ))}
-                        </ButtonGroup>
-                    )}
-                    <Form.Check
-                        type="switch"
-                        id="christmas-mode"
-                        className="order-first order-md-0 ms-md-auto"
-                        label={
-                            <>
-                                <i className="bi bi-snow2 me-1"></i>Julegavemodus
-                            </>
-                        }
-                        checked={christmas}
-                        onChange={(e) => toggleChristmas(e.target.checked)}
-                    />
-                </div>
-
-                {christmas && (
-                    <div className="mb-3">
-                        <small className="text-body-secondary d-block mb-1">
-                            Jul, gitt 24.12.
-                            {editingYear ? (
-                                <Form.Control
-                                    type="number"
-                                    size="sm"
-                                    className="d-inline-block christmas-year-input"
-                                    aria-label="År"
-                                    autoFocus
-                                    min={FIRST_YEAR}
-                                    max={thisYear}
-                                    value={yearDraft}
-                                    onChange={(e) => setYearDraft(e.target.value)}
-                                    onBlur={commitYear}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            commitYear();
-                                        } else if (e.key === "Escape") {
-                                            setEditingYear(false);
-                                        }
-                                    }}
-                                />
-                            ) : (
-                                <>
-                                    {christmasYear}
-                                    <Button
-                                        variant="link"
-                                        size="sm"
-                                        className="p-0 ms-1 align-baseline"
-                                        aria-label="Endre år"
-                                        onClick={startYearEdit}>
-                                        <i className="bi bi-pencil"></i>
-                                    </Button>
-                                </>
-                            )}
-                            {" "}· {remainingGivers.length} igjen å registrere fra
-                            {hasHistory ? ` (basert på julegaver i ${[...historyYears].reverse().join(" og ")})` : ""}
-                        </small>
-                        <div className="d-flex flex-wrap gap-1">
-                            {remainingGivers.map((person) => (
-                                <Button
-                                    key={person.id}
-                                    size="sm"
-                                    variant={isGiver(person) ? "primary" : "outline-secondary"}
-                                    aria-pressed={isGiver(person)}
-                                    onClick={() => toggleGiver(person)}>
-                                    {person.name}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
+        <>
+            {/* On mobile the Christmas switch sits above the quick choices */}
+            <div className="d-flex flex-column flex-md-row flex-md-wrap align-items-start align-items-md-center gap-2 mb-3">
+                {household.length === 0 ? (
+                    <small className="text-body-secondary">
+                        Marker deg selv og samboeren som husstand under «Rediger personer» nederst for å få hurtigvalg.
+                    </small>
+                ) : (
+                    <ButtonGroup className="quick-choices">
+                        {quickChoices.map((choice) => (
+                            <Button
+                                key={choice.label}
+                                variant={isActive(choice) ? "primary" : "outline-primary"}
+                                onClick={() => applyChoice(choice)}
+                            >
+                                {choice.label}
+                            </Button>
+                        ))}
+                    </ButtonGroup>
                 )}
+                <Form.Check
+                    type="switch"
+                    id="christmas-mode"
+                    className="order-first order-md-0 ms-md-auto"
+                    label={
+                        <>
+                            <i className="bi bi-snow2 me-1"></i>Julegavemodus
+                        </>
+                    }
+                    checked={christmas}
+                    onChange={(e) => toggleChristmas(e.target.checked)}
+                />
+            </div>
 
-                <Form onSubmit={handleSubmit}>
-                    <Row className="g-2 mb-2">
-                        <Col md={6}>
-                            <PersonPicker label="Fra" value={givers} persons={persons} onChange={setGivers} />
-                        </Col>
-                        <Col md={6}>
-                            <PersonPicker
-                                label="Til"
-                                value={recipients}
-                                persons={persons}
-                                onChange={setRecipients}
+            {christmas && (
+                <div className="mb-3">
+                    <small className="text-body-secondary d-block mb-1">
+                        Jul, gitt 24.12.
+                        {editingYear ? (
+                            <Form.Control
+                                type="number"
+                                size="sm"
+                                className="d-inline-block christmas-year-input"
+                                aria-label="År"
+                                autoFocus
+                                min={FIRST_YEAR}
+                                max={thisYear}
+                                value={yearDraft}
+                                onChange={(e) => setYearDraft(e.target.value)}
+                                onBlur={commitYear}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        commitYear();
+                                    } else if (e.key === "Escape") {
+                                        setEditingYear(false);
+                                    }
+                                }}
                             />
-                        </Col>
-                    </Row>
-
-                    <Row className="g-2 mb-3">
-                        {!christmas && (
-                            // The title field takes the date's place when there is no date given
-                            <Col md={isGiven ? 5 : 7}>
-                                <Form.Group controlId="gift-title">
-                                    <Form.Label>Gave</Form.Label>
-                                    <Form.Control
-                                        ref={titleRef}
-                                        maxLength={150}
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                    />
-                                </Form.Group>
-                            </Col>
+                        ) : (
+                            <>
+                                {christmasYear}
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="p-0 ms-1 align-baseline"
+                                    aria-label="Endre år"
+                                    onClick={startYearEdit}>
+                                    <i className="bi bi-pencil"></i>
+                                </Button>
+                            </>
                         )}
-                        {/* Right below the title on mobile, a full line of its own last in the row from md */}
-                        <Col xs={12} className="order-md-last">
-                            <Form.Group controlId="gift-description">
-                                <Form.Label>Beskrivelse</Form.Label>
+                        {" "}· {remainingGivers.length} igjen å registrere fra
+                        {hasHistory ? ` (basert på julegaver i ${[...historyYears].reverse().join(" og ")})` : ""}
+                    </small>
+                    <div className="d-flex flex-wrap gap-1">
+                        {remainingGivers.map((person) => (
+                            <Button
+                                key={person.id}
+                                size="sm"
+                                variant={isGiver(person) ? "primary" : "outline-secondary"}
+                                aria-pressed={isGiver(person)}
+                                onClick={() => toggleGiver(person)}>
+                                {person.name}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <Form onSubmit={handleSubmit}>
+                <Row className="g-2 mb-2">
+                    <Col md={6}>
+                        <PersonPicker label="Fra" value={givers} persons={persons} onChange={setGivers} />
+                    </Col>
+                    <Col md={6}>
+                        <PersonPicker
+                            label="Til"
+                            value={recipients}
+                            persons={persons}
+                            onChange={setRecipients}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="g-2 mb-3">
+                    {!christmas && (
+                        // The title field takes the date's place when there is no date given
+                        <Col md={isGiven ? 5 : 7}>
+                            <Form.Group controlId="gift-title">
+                                <Form.Label>Gave</Form.Label>
                                 <Form.Control
-                                    as="textarea"
-                                    rows={2}
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    ref={titleRef}
+                                    maxLength={150}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Form.Group>
                         </Col>
-                        {!christmas && (
-                            <>
-                                <Col xs={6} md={2}>
-                                    <Form.Group controlId="gift-price">
-                                        <Form.Label>Pris</Form.Label>
+                    )}
+                    {/* Right below the title on mobile, a full line of its own last in the row from md */}
+                    <Col xs={12} className="order-md-last">
+                        <Form.Group controlId="gift-description">
+                            <Form.Label>Beskrivelse</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    {!christmas && (
+                        <>
+                            <Col xs={6} md={2}>
+                                <Form.Group controlId="gift-price">
+                                    <Form.Label>Pris</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        inputMode="numeric"
+                                        min={0}
+                                        step={1}
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={6} md={3}>
+                                <Form.Group controlId="gift-occasion">
+                                    <Form.Label>Anledning</Form.Label>
+                                    <Form.Control
+                                        list={occasionListId}
+                                        value={occasion}
+                                        placeholder="F.eks. Jul"
+                                        onChange={(e) => setOccasion(e.target.value)}
+                                    />
+                                    <datalist id={occasionListId}>
+                                        {occasions.map((item) => (
+                                            <option key={item.id} value={item.name} />
+                                        ))}
+                                    </datalist>
+                                </Form.Group>
+                            </Col>
+                            {isGiven && (
+                                <Col md={2}>
+                                    <Form.Group controlId="gift-date">
+                                        <Form.Label>Dato gitt</Form.Label>
                                         <Form.Control
-                                            type="number"
-                                            inputMode="numeric"
-                                            min={0}
-                                            step={1}
-                                            value={price}
-                                            onChange={(e) => setPrice(e.target.value)}
+                                            type="date"
+                                            value={date}
+                                            onChange={(e) => setDate(e.target.value)}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={6} md={3}>
-                                    <Form.Group controlId="gift-occasion">
-                                        <Form.Label>Anledning</Form.Label>
-                                        <Form.Control
-                                            list={occasionListId}
-                                            value={occasion}
-                                            placeholder="F.eks. Jul"
-                                            onChange={(e) => setOccasion(e.target.value)}
-                                        />
-                                        <datalist id={occasionListId}>
-                                            {occasions.map((item) => (
-                                                <option key={item.id} value={item.name} />
-                                            ))}
-                                        </datalist>
-                                    </Form.Group>
-                                </Col>
-                                {isGiven && (
-                                    <Col md={2}>
-                                        <Form.Group controlId="gift-date">
-                                            <Form.Label>Dato gitt</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                value={date}
-                                                onChange={(e) => setDate(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                )}
-                            </>
-                        )}
-                    </Row>
+                            )}
+                        </>
+                    )}
+                </Row>
 
-                    <div className="d-flex align-items-center gap-2">
-                        <Button type="submit" variant="success" disabled={saving}>
-                            {saving ? "Lagrer…" : "Registrer gave"}
-                        </Button>
-                        {!christmas && (
-                            <Form.Select
-                                className="w-auto"
-                                aria-label="Status"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value as GiftStatus)}>
-                                {STATUS_ORDER.map((item) => (
-                                    <option key={item} value={item}>
-                                        {STATUS_LABELS[item]}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        )}
-                    </div>
-                </Form>
-            </Card.Body>
-        </Card>
+                <div className="d-flex align-items-center gap-2">
+                    <Button type="submit" variant="success" disabled={saving}>
+                        {saving ? "Lagrer…" : "Registrer gave"}
+                    </Button>
+                    {!christmas && (
+                        <Form.Select
+                            className="w-auto"
+                            aria-label="Status"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value as GiftStatus)}>
+                            {STATUS_ORDER.map((item) => (
+                                <option key={item} value={item}>
+                                    {STATUS_LABELS[item]}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    )}
+                </div>
+            </Form>
+        </>
     );
 }
 

@@ -78,15 +78,39 @@ main > header {
     }
 }
 
-/* Mobile version of the gift tables (GiftYearList) */
-.gift-list {
-    list-style: none;
-    margin: 0 0 1rem;
-    padding: 0 0.75rem;
+/* Gift log folder tabs (giftlog.tsx): no borders, inactive tabs half see-through,
+   the active one has the panel's color so it runs into .tab-panel.
+   .nav-tabs too, since bootstrap.min.css is loaded after this file */
+.nav-tabs.giftlog-tabs {
+    --bs-nav-tabs-border-width: 0;
+    --bs-nav-tabs-link-active-bg: var(--bs-body-bg);
+    --bs-nav-tabs-link-active-color: var(--bs-emphasis-color);
+    --bs-nav-link-color: rgba(var(--bs-emphasis-color-rgb), 0.7);
+    --bs-nav-link-hover-color: var(--bs-emphasis-color);
+    gap: 2px;
+}
+.nav-tabs.giftlog-tabs .nav-link {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.45);
+}
+.tab-panel {
+    padding: 0.75rem;
     background-color: var(--bs-body-bg);
     /* data-bs-theme only sets the variables; text would otherwise inherit body's light-theme color */
     color: var(--bs-body-color);
-    border-radius: var(--bs-border-radius);
+    border-radius: 0 var(--bs-border-radius) var(--bs-border-radius) var(--bs-border-radius);
+}
+/* Sections in the panel are split by a line. The row's negative margins match the panel padding,
+   so the line runs from edge to edge */
+.tab-panel > .row + .row {
+    border-top: 1px solid var(--bs-border-color);
+    padding-top: 1rem;
+}
+
+/* Mobile version of the gift tables (GiftYearList); sits on .tab-panel's background */
+.gift-list {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
 }
 .gift-list-item {
     padding: 0.5rem 0;

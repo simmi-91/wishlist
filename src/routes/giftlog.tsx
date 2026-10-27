@@ -16,7 +16,8 @@ function GiftlogLayout() {
     return (
         // px-0: the root layout's fluid container already pads the sides; this one only limits the width
         <Container data-bs-theme="dark" className="px-0">
-            <Nav variant="tabs" className="mb-3">
+            {/* Folder tabs: the active tab runs straight into the panel below */}
+            <Nav variant="tabs" className="giftlog-tabs">
                 <Nav.Item>
                     {/* exact: otherwise this tab is active on /giftlog/history too */}
                     <Link to="/giftlog" className="nav-link" activeOptions={{ exact: true }}>
@@ -32,7 +33,9 @@ function GiftlogLayout() {
                 </Nav.Item>
             </Nav>
 
-            <Outlet />
+            <div className="tab-panel">
+                <Outlet />
+            </div>
         </Container>
     );
 }
