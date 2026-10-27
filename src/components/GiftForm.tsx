@@ -20,6 +20,7 @@ const joinNames = (refs: PersonRef[]) => refs.map((ref) => ref.name).join(", ");
 const CHRISTMAS = "Jul";
 const CHRISTMAS_TITLE = "Julegave"; // when no description is typed (chk_giftlog_gift_text)
 const CHRISTMAS_MODE_KEY = "giftlog.christmasMode";
+const FIRST_YEAR = 1990; // earliest year that can be chosen in Christmas mode
 
 // Remembered per browser, so a reload on Christmas Eve keeps the mode
 function readChristmasMode() {
@@ -76,6 +77,12 @@ function GiftForm() {
     const [date, setDate] = useState(todayIso());
     const [status, setStatus] = useState<GiftStatus>("given");
     const [christmas, setChristmas] = useState(readChristmasMode);
+    const thisYear = new Date().getFullYear();
+    const [christmasYear, setChristmasYear] = useState(thisYear);
+    const [editingYear, setEditingYear] = useState(false);
+    const [yearDraft, setYearDraft] = useState("");
+    // Household persons in «Til» when the first giver was picked; keeps the list filter while picking
+    const [pickFilter, setPickFilter] = useState<number[] | null>(null);
     const [saving, setSaving] = useState(false);
 
     const household = persons.filter((person) => person.is_household === 1);
@@ -85,6 +92,7 @@ function GiftForm() {
     const applyDefaults = (christmasMode: boolean) => {
         setGivers(christmasMode ? [] : household.map(toRef));
         setRecipients(christmasMode ? household.map(toRef) : []);
+        setPickFilter(null);
     };
 
     // Once the persons are loaded
@@ -94,21 +102,39 @@ function GiftForm() {
         applyDefaults(christmas);
     }
 
+    const startYearEdit = () => {
+        setYearDraft(String(christmasYear));
+        setEditingYear(true);
+    };
+
+    // Keeps the old year if the typed one is not a whole year in range
+    const commitYear = () => {
+        const year = Number(yearDraft);
+        if (Number.isInteger(year) && year >= FIRST_YEAR && year <= thisYear) {
+            setChristmasYear(year);
+        }
+        setEditingYear(false);
+    };
+
     const toggleChristmas = (on: boolean) => {
         setChristmas(on);
         saveChristmasMode(on);
         applyDefaults(on);
     };
 
-    // Christmas gifts this year and the history years before it
-    const thisYear = new Date().getFullYear();
+    // Christmas gifts in the chosen year, with the two latest years before it that have any as history
     const christmasOccasion = findByName(occasions, CHRISTMAS);
-    const isChristmasGift = (gift: Gift) => gift.occasion_id === christmasOccasion?.id;
-    const { data: givenThisYear = [] } = useGifts({ year: thisYear, status: "given" });
-    const { data: givenLastYear = [] } = useGifts({ year: thisYear - 1, status: "given" });
-    const { data: givenYearBefore = [] } = useGifts({ year: thisYear - 2, status: "given" });
-    const christmasThisYear = givenThisYear.filter(isChristmasGift);
-    const christmasHistory = [...givenLastYear, ...givenYearBefore].filter(isChristmasGift);
+    const { data: givenGifts = [] } = useGifts({ occasion_id: christmasOccasion?.id, status: "given" });
+    const christmasGifts = christmasOccasion
+        ? givenGifts.filter((gift) => gift.occasion_id === christmasOccasion.id)
+        : [];
+    const christmasThisYear = christmasGifts.filter((gift) => gift.year === christmasYear);
+    const historyYears = [
+        ...new Set(christmasGifts.flatMap((gift) => (gift.year !== null && gift.year < christmasYear ? [gift.year] : []))),
+    ]
+        .sort((a, b) => b - a)
+        .slice(0, 2);
+    const christmasHistory = christmasGifts.filter((gift) => gift.year !== null && historyYears.includes(gift.year));
 
     // Household persons each person has given Christmas gifts to before (expected) and this year
     const expectedRecipients = householdRecipientsByGiver(christmasHistory, isHousehold);
@@ -124,9 +150,16 @@ function GiftForm() {
         const received = receivedThisYear.get(personId);
         return [...expected].filter((id) => id !== personId && !received?.has(id));
     };
+    // «Til» with only some of the household (e.g. «Til Elin») limits the list to those who still give to them
+    const householdTilIds = household.filter((member) => tilIds.includes(member.id)).map((member) => member.id);
+    const listFilter = pickFilter ?? householdTilIds;
+    const isFiltered = listFilter.length > 0 && listFilter.length < household.length;
+    const inFilter = (id: number) => !isFiltered || listFilter.includes(id);
+    const householdIn = (ids: number[]) => household.filter((member) => ids.includes(member.id)).map(toRef);
+
     // The household first, then by name
     const remainingGivers = persons
-        .filter((person) => remainingFor(person.id).length > 0)
+        .filter((person) => remainingFor(person.id).some(inFilter))
         .sort((a, b) => b.is_household - a.is_household || a.name.localeCompare(b.name, "nb"));
 
     const isGiver = (person: Person) => givers.some((ref) => ref.id === person.id);
@@ -135,14 +168,21 @@ function GiftForm() {
     const toggleGiver = (person: Person) => {
         const next = isGiver(person) ? givers.filter((ref) => ref.id !== person.id) : [...givers, toRef(person)];
         setGivers(next);
+        // Back to the «Til» the picking started from
+        if (next.length === 0) {
+            setPickFilter(null);
+            setRecipients(listFilter.length > 0 ? householdIn(listFilter) : household.map(toRef));
+            return;
+        }
+        setPickFilter(listFilter);
         if (!hasHistory) {
             // Nobody gives to themselves
             setRecipients((prev) => prev.filter((ref) => !next.some((giver) => giver.id === ref.id)));
             return;
         }
-        const ids = new Set(next.flatMap((ref) => (ref.id === undefined ? [] : remainingFor(ref.id))));
-        if (ids.size > 0) {
-            setRecipients(household.filter((member) => ids.has(member.id)).map(toRef));
+        const ids = next.flatMap((ref) => (ref.id === undefined ? [] : remainingFor(ref.id))).filter(inFilter);
+        if (ids.length > 0) {
+            setRecipients(householdIn(ids));
         }
     };
 
@@ -173,11 +213,13 @@ function GiftForm() {
         const typedIn = (refs: PersonRef[]) => refs.filter((ref) => !isHousehold(ref));
         setGivers((prev) => [...choice.givers.map(toRef), ...typedIn(prev)]);
         setRecipients((prev) => [...choice.recipients.map(toRef), ...typedIn(prev)]);
+        // The new «Til» decides the Christmas list
+        setPickFilter(null);
     };
 
     // Christmas mode fills in the hidden fields
     const fields = christmas
-        ? { status: "given" as GiftStatus, occasion: CHRISTMAS, date: `${thisYear}-12-24`, title: "", price: "" }
+        ? { status: "given" as GiftStatus, occasion: CHRISTMAS, date: `${christmasYear}-12-24`, title: "", price: "" }
         : { status, occasion, date, title, price };
 
     // Only given gifts have a date given
@@ -231,11 +273,10 @@ function GiftForm() {
             setDescription("");
             setPrice("");
             if (christmas) {
-                // The next giver is picked from the list, which sets «Til» when there is history
+                // The next giver is picked from the list; «Til» goes back to what the picking started from
                 setGivers([]);
-                if (!hasHistory) {
-                    setRecipients(household.map(toRef));
-                }
+                setPickFilter(null);
+                setRecipients(listFilter.length > 0 ? householdIn(listFilter) : household.map(toRef));
             } else {
                 // Keep occasion, date and the household side for the next gift
                 setGivers((prev) => prev.filter(isHousehold));
@@ -252,13 +293,14 @@ function GiftForm() {
     return (
         <Card>
             <Card.Body>
-                <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+                {/* On mobile the Christmas switch sits above the quick choices */}
+                <div className="d-flex flex-column flex-md-row flex-md-wrap align-items-start align-items-md-center gap-2 mb-3">
                     {household.length === 0 ? (
                         <small className="text-body-secondary">
                             Marker deg selv og samboeren som husstand under «Rediger personer» nederst for å få hurtigvalg.
                         </small>
                     ) : (
-                        <ButtonGroup>
+                        <ButtonGroup className="quick-choices">
                             {quickChoices.map((choice) => (
                                 <Button
                                     key={choice.label}
@@ -273,7 +315,7 @@ function GiftForm() {
                     <Form.Check
                         type="switch"
                         id="christmas-mode"
-                        className="ms-auto"
+                        className="order-first order-md-0 ms-md-auto"
                         label={
                             <>
                                 <i className="bi bi-snow2 me-1"></i>Julegavemodus
@@ -287,8 +329,42 @@ function GiftForm() {
                 {christmas && (
                     <div className="mb-3">
                         <small className="text-body-secondary d-block mb-1">
-                            Jul, gitt 24.12.{thisYear} · {remainingGivers.length} igjen å registrere fra
-                            {hasHistory ? " (basert på julegaver de to siste årene)" : ""}
+                            Jul, gitt 24.12.
+                            {editingYear ? (
+                                <Form.Control
+                                    type="number"
+                                    size="sm"
+                                    className="d-inline-block christmas-year-input"
+                                    aria-label="År"
+                                    autoFocus
+                                    min={FIRST_YEAR}
+                                    max={thisYear}
+                                    value={yearDraft}
+                                    onChange={(e) => setYearDraft(e.target.value)}
+                                    onBlur={commitYear}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            commitYear();
+                                        } else if (e.key === "Escape") {
+                                            setEditingYear(false);
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                <>
+                                    {christmasYear}
+                                    <Button
+                                        variant="link"
+                                        size="sm"
+                                        className="p-0 ms-1 align-baseline"
+                                        aria-label="Endre år"
+                                        onClick={startYearEdit}>
+                                        <i className="bi bi-pencil"></i>
+                                    </Button>
+                                </>
+                            )}
+                            {" "}· {remainingGivers.length} igjen å registrere fra
+                            {hasHistory ? ` (basert på julegaver i ${[...historyYears].reverse().join(" og ")})` : ""}
                         </small>
                         <div className="d-flex flex-wrap gap-1">
                             {remainingGivers.map((person) => (

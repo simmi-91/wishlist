@@ -14,7 +14,8 @@ export const Route = createFileRoute("/giftlog")({
 // Shared frame for /giftlog (register) and /giftlog/history
 function GiftlogLayout() {
     return (
-        <Container data-bs-theme="dark">
+        // px-0: the root layout's fluid container already pads the sides; this one only limits the width
+        <Container data-bs-theme="dark" className="px-0">
             <Nav variant="tabs" className="mb-3">
                 <Nav.Item>
                     {/* exact: otherwise this tab is active on /giftlog/history too */}

@@ -56,6 +56,21 @@ main > header {
   white-space: pre-line;
 }
 
+/* Year field inline in the Christmas mode text (GiftForm).
+   .form-control too, since bootstrap.min.css is loaded after this file and sets width: 100% */
+.form-control.christmas-year-input {
+  width: 5.5rem;
+  vertical-align: baseline;
+}
+
+/* Quick choices in GiftForm take less room on mobile (same size as btn-sm) */
+@media (max-width: 767.98px) {
+  .quick-choices > .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
 /* Mobile version of the gift tables (GiftYearList) */
 .gift-list {
   list-style: none;
