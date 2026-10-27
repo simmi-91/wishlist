@@ -72,11 +72,22 @@ function EditRoute() {
         <Row>
           <Col>
             {item.active === 1 ? (
-              <Badge bg="success" className="float-start">Active</Badge>
+              <Badge bg="success" className="float-start">
+                Active
+              </Badge>
             ) : (
-              <Badge bg="secondary" className="float-start">inctive</Badge>
+              <Badge bg="secondary" className="float-start">
+                inctive
+              </Badge>
             )}
           </Col>
+          {item.images && item.images.length === 0 && (
+            <Col>
+              <Badge bg="warning" text="black">
+                No image
+              </Badge>
+            </Col>
+          )}
           <Col>
             <Button
               className="float-end"

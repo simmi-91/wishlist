@@ -43,12 +43,60 @@ main > header {
   overflow-y: auto;
 }
 
+/* Table header that stays visible while .content-scroll scrolls.
+   Negative top cancels the container's py-2 padding (__root.tsx) */
+.sticky-head {
+  position: sticky;
+  top: -0.5rem;
+  z-index: 1;
+}
+
+/* Keeps line breaks typed into the description */
+.gift-description {
+  white-space: pre-line;
+}
+
+/* Mobile version of the gift tables (GiftYearList) */
+.gift-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0 0.75rem;
+  background-color: var(--bs-body-bg);
+  /* data-bs-theme only sets the variables; text would otherwise inherit body's light-theme color */
+  color: var(--bs-body-color);
+  border-radius: var(--bs-border-radius);
+}
+.gift-list-item {
+  padding: 0.5rem 0;
+}
+.gift-list-item + .gift-list-item {
+  border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.45);
+}
+.gift-list-line {
+  padding: 0.25rem 0;
+}
+.gift-list-line + .gift-list-line {
+  border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
+}
+/* Name column plus two right-aligned number columns that line up across lines */
+.gift-list-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(2, 6rem);
+  column-gap: 0.5rem;
+  align-items: baseline;
+}
+
 .bg-see-through {
   background-color: rgba(255, 255, 255, 0.6);
 }
 
 .ql-editor {
   min-height: 200px;
+}
+
+.ql-container {
+  position: relative;
+  z-index: 2;
 }
 
 .wish-card .card-body p {

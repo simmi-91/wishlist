@@ -10,14 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PreviewRouteImport } from './routes/preview'
+import { Route as GiftlogRouteImport } from './routes/giftlog'
 import { Route as EditRouteImport } from './routes/edit'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GiftlogIndexRouteImport } from './routes/giftlog.index'
+import { Route as GiftlogHistoryRouteImport } from './routes/giftlog.history'
 import { Route as EditNewRouteImport } from './routes/edit.new'
 import { Route as EditWishIdRouteImport } from './routes/edit.$wishId'
 
 const PreviewRoute = PreviewRouteImport.update({
   id: '/preview',
   path: '/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftlogRoute = GiftlogRouteImport.update({
+  id: '/giftlog',
+  path: '/giftlog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditRoute = EditRouteImport.update({
@@ -29,6 +37,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GiftlogIndexRoute = GiftlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GiftlogRoute,
+} as any)
+const GiftlogHistoryRoute = GiftlogHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => GiftlogRoute,
 } as any)
 const EditNewRoute = EditNewRouteImport.update({
   id: '/new',
@@ -44,9 +62,12 @@ const EditWishIdRoute = EditWishIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/edit': typeof EditRouteWithChildren
+  '/giftlog': typeof GiftlogRouteWithChildren
   '/preview': typeof PreviewRoute
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
+  '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog/': typeof GiftlogIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,26 +75,56 @@ export interface FileRoutesByTo {
   '/preview': typeof PreviewRoute
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
+  '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog': typeof GiftlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/edit': typeof EditRouteWithChildren
+  '/giftlog': typeof GiftlogRouteWithChildren
   '/preview': typeof PreviewRoute
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
+  '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog/': typeof GiftlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
+  fullPaths:
+    | '/'
+    | '/edit'
+    | '/giftlog'
+    | '/preview'
+    | '/edit/$wishId'
+    | '/edit/new'
+    | '/giftlog/history'
+    | '/giftlog/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
-  id: '__root__' | '/' | '/edit' | '/preview' | '/edit/$wishId' | '/edit/new'
+  to:
+    | '/'
+    | '/edit'
+    | '/preview'
+    | '/edit/$wishId'
+    | '/edit/new'
+    | '/giftlog/history'
+    | '/giftlog'
+  id:
+    | '__root__'
+    | '/'
+    | '/edit'
+    | '/giftlog'
+    | '/preview'
+    | '/edit/$wishId'
+    | '/edit/new'
+    | '/giftlog/history'
+    | '/giftlog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EditRoute: typeof EditRouteWithChildren
+  GiftlogRoute: typeof GiftlogRouteWithChildren
   PreviewRoute: typeof PreviewRoute
 }
 
@@ -84,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/preview'
       fullPath: '/preview'
       preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giftlog': {
+      id: '/giftlog'
+      path: '/giftlog'
+      fullPath: '/giftlog'
+      preLoaderRoute: typeof GiftlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/edit': {
@@ -99,6 +157,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/giftlog/': {
+      id: '/giftlog/'
+      path: '/'
+      fullPath: '/giftlog/'
+      preLoaderRoute: typeof GiftlogIndexRouteImport
+      parentRoute: typeof GiftlogRoute
+    }
+    '/giftlog/history': {
+      id: '/giftlog/history'
+      path: '/history'
+      fullPath: '/giftlog/history'
+      preLoaderRoute: typeof GiftlogHistoryRouteImport
+      parentRoute: typeof GiftlogRoute
     }
     '/edit/new': {
       id: '/edit/new'
@@ -129,9 +201,23 @@ const EditRouteChildren: EditRouteChildren = {
 
 const EditRouteWithChildren = EditRoute._addFileChildren(EditRouteChildren)
 
+interface GiftlogRouteChildren {
+  GiftlogHistoryRoute: typeof GiftlogHistoryRoute
+  GiftlogIndexRoute: typeof GiftlogIndexRoute
+}
+
+const GiftlogRouteChildren: GiftlogRouteChildren = {
+  GiftlogHistoryRoute: GiftlogHistoryRoute,
+  GiftlogIndexRoute: GiftlogIndexRoute,
+}
+
+const GiftlogRouteWithChildren =
+  GiftlogRoute._addFileChildren(GiftlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EditRoute: EditRouteWithChildren,
+  GiftlogRoute: GiftlogRouteWithChildren,
   PreviewRoute: PreviewRoute,
 }
 export const routeTree = rootRouteImport
