@@ -1,121 +1,128 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 320px;
-  min-height: 100vh;
-  overflow: hidden;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 320px;
+    min-height: 100vh;
+    overflow: hidden;
 
-  background: linear-gradient(135deg, #290101 0%, #520101 50%, #1a0000 100%);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  background-attachment: fixed;
+    background: linear-gradient(135deg, #290101 0%, #520101 50%, #1a0000 100%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
 main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 
-  height: 100vh;
-  overflow: hidden;
+    height: 100vh;
+    overflow: hidden;
 }
 main > header {
-  flex-shrink: 0;
+    flex-shrink: 0;
+}
+/* Smaller title on mobile; Bootstrap's fs-* utilities have no responsive variants.
+   .navbar-brand too, since bootstrap.min.css is loaded after this file */
+@media (max-width: 767.98px) {
+    .navbar-brand.header-brand {
+        font-size: 1.1rem;
+    }
 }
 .content-scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 /* Table header that stays visible while .content-scroll scrolls.
    Negative top cancels the container's py-2 padding (__root.tsx) */
 .sticky-head {
-  position: sticky;
-  top: -0.5rem;
-  z-index: 1;
+    position: sticky;
+    top: -0.5rem;
+    z-index: 1;
 }
 
 /* Keeps line breaks typed into the description */
 .gift-description {
-  white-space: pre-line;
+    white-space: pre-line;
 }
 
 /* Year field inline in the Christmas mode text (GiftForm).
    .form-control too, since bootstrap.min.css is loaded after this file and sets width: 100% */
 .form-control.christmas-year-input {
-  width: 5.5rem;
-  vertical-align: baseline;
+    width: 5.5rem;
+    vertical-align: baseline;
 }
 
 /* Quick choices in GiftForm take less room on mobile (same size as btn-sm) */
 @media (max-width: 767.98px) {
-  .quick-choices > .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-  }
+    .quick-choices > .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
 }
 
 /* Mobile version of the gift tables (GiftYearList) */
 .gift-list {
-  list-style: none;
-  margin: 0 0 1rem;
-  padding: 0 0.75rem;
-  background-color: var(--bs-body-bg);
-  /* data-bs-theme only sets the variables; text would otherwise inherit body's light-theme color */
-  color: var(--bs-body-color);
-  border-radius: var(--bs-border-radius);
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0 0.75rem;
+    background-color: var(--bs-body-bg);
+    /* data-bs-theme only sets the variables; text would otherwise inherit body's light-theme color */
+    color: var(--bs-body-color);
+    border-radius: var(--bs-border-radius);
 }
 .gift-list-item {
-  padding: 0.5rem 0;
+    padding: 0.5rem 0;
 }
 .gift-list-item + .gift-list-item {
-  border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.45);
+    border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.45);
 }
 .gift-list-line {
-  padding: 0.25rem 0;
+    padding: 0.25rem 0;
 }
 .gift-list-line + .gift-list-line {
-  border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
+    border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
 }
 /* Name column plus two right-aligned number columns that line up across lines */
 .gift-list-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(2, 6rem);
-  column-gap: 0.5rem;
-  align-items: baseline;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(2, 6rem);
+    column-gap: 0.5rem;
+    align-items: baseline;
 }
 
 .bg-see-through {
-  background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.6);
 }
 
 .ql-editor {
-  min-height: 200px;
+    min-height: 200px;
 }
 
 .ql-container {
-  position: relative;
-  z-index: 2;
+    position: relative;
+    z-index: 2;
 }
 
 .wish-card .card-body p {
-  margin: 0;
+    margin: 0;
 }
 /*
 @media (prefers-color-scheme: light) {
