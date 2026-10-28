@@ -122,6 +122,9 @@ function PersonManager() {
                     <tr>
                         <th>Navn</th>
                         <th>Husstand</th>
+                        <th className="text-end" title="Antall gaver personen er giver eller mottaker av">
+                            Gaver
+                        </th>
                         <th></th>
                     </tr>
                 </thead>
@@ -157,6 +160,7 @@ function PersonManager() {
                                     onChange={() => toggleHousehold(person)}
                                 />
                             </td>
+                            <td className="text-end">{person.gift_count}</td>
                             <td className="text-end text-nowrap">
                                 {editingId === person.id ? (
                                     <>
@@ -189,11 +193,18 @@ function PersonManager() {
                                         >
                                             <i className="bi bi-pencil"></i>
                                         </Button>
+                                        {/* Only unused persons can be deleted (the database refuses otherwise) */}
                                         <Button
                                             size="sm"
                                             variant="outline-danger"
                                             className="ms-1"
                                             aria-label={`Slett ${person.name}`}
+                                            title={
+                                                person.gift_count > 0
+                                                    ? "Brukt på gaver, kan ikke slettes"
+                                                    : undefined
+                                            }
+                                            disabled={person.gift_count > 0}
                                             onClick={() => handleDelete(person)}
                                         >
                                             <i className="bi bi-trash"></i>

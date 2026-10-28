@@ -98,8 +98,8 @@ export async function updatePerson(
   });
 }
 
-export async function deletePerson(id: number): Promise<Person> {
-  return client.request<Person>(`giftlog/persons/${id}`, {
+export async function deletePerson(id: number): Promise<Omit<Person, "gift_count">> {
+  return client.request<Omit<Person, "gift_count">>(`giftlog/persons/${id}`, {
     method: "DELETE",
   });
 }

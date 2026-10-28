@@ -52,6 +52,7 @@ export type Person = {
   id: number;
   name: string;
   is_household: number; // 0 | 1
+  gift_count: number; // gifts the person is linked to; only 0 can be deleted
 };
 
 export type NewPerson = {
