@@ -11,7 +11,7 @@ export const Route = createFileRoute("/giftlog")({
     ),
 });
 
-// Shared frame for /giftlog (register) and /giftlog/history
+// Shared frame for /giftlog (register), /giftlog/history and /giftlog/overview
 function GiftlogLayout() {
     return (
         // px-0: the root layout's fluid container already pads the sides; this one only limits the width
@@ -29,6 +29,12 @@ function GiftlogLayout() {
                     <Link to="/giftlog/history" className="nav-link">
                         <i className="bi bi-search me-1"></i>
                         Historikk
+                    </Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Link to="/giftlog/overview" className="nav-link">
+                        <i className="bi bi-bar-chart me-1"></i>
+                        Oversikt
                     </Link>
                 </Nav.Item>
             </Nav>

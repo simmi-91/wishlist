@@ -106,6 +106,26 @@ main > header {
     padding-top: 1rem;
 }
 
+/* Year summary (GiftSummaryTables): a line above each year only, so a year and its
+   occasion/person lines read as one group */
+.summary-table tbody td {
+    border-bottom-width: 0;
+}
+.summary-table .summary-year {
+    cursor: pointer;
+}
+.summary-table .summary-year td {
+    border-top-width: var(--bs-border-width);
+}
+.summary-table .summary-sub td {
+    padding-top: 0;
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+}
+.summary-table .summary-sub td:first-child {
+    padding-left: 1.5rem;
+}
+
 /* Mobile version of the gift tables (GiftYearList); sits on .tab-panel's background */
 .gift-list {
     list-style: none;
@@ -123,13 +143,6 @@ main > header {
 }
 .gift-list-line + .gift-list-line {
     border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
-}
-/* Name column plus two right-aligned number columns that line up across lines */
-.gift-list-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) repeat(2, 6rem);
-    column-gap: 0.5rem;
-    align-items: baseline;
 }
 
 .bg-see-through {

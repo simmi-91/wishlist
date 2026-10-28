@@ -14,6 +14,7 @@ import { Route as GiftlogRouteImport } from './routes/giftlog'
 import { Route as EditRouteImport } from './routes/edit'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GiftlogIndexRouteImport } from './routes/giftlog.index'
+import { Route as GiftlogOverviewRouteImport } from './routes/giftlog.overview'
 import { Route as GiftlogHistoryRouteImport } from './routes/giftlog.history'
 import { Route as EditNewRouteImport } from './routes/edit.new'
 import { Route as EditWishIdRouteImport } from './routes/edit.$wishId'
@@ -43,6 +44,11 @@ const GiftlogIndexRoute = GiftlogIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GiftlogRoute,
 } as any)
+const GiftlogOverviewRoute = GiftlogOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => GiftlogRoute,
+} as any)
 const GiftlogHistoryRoute = GiftlogHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
   '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog/overview': typeof GiftlogOverviewRoute
   '/giftlog/': typeof GiftlogIndexRoute
 }
 export interface FileRoutesByTo {
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
   '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog/overview': typeof GiftlogOverviewRoute
   '/giftlog': typeof GiftlogIndexRoute
 }
 export interface FileRoutesById {
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/edit/$wishId': typeof EditWishIdRoute
   '/edit/new': typeof EditNewRoute
   '/giftlog/history': typeof GiftlogHistoryRoute
+  '/giftlog/overview': typeof GiftlogOverviewRoute
   '/giftlog/': typeof GiftlogIndexRoute
 }
 export interface FileRouteTypes {
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/edit/$wishId'
     | '/edit/new'
     | '/giftlog/history'
+    | '/giftlog/overview'
     | '/giftlog/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/edit/$wishId'
     | '/edit/new'
     | '/giftlog/history'
+    | '/giftlog/overview'
     | '/giftlog'
   id:
     | '__root__'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/edit/$wishId'
     | '/edit/new'
     | '/giftlog/history'
+    | '/giftlog/overview'
     | '/giftlog/'
   fileRoutesById: FileRoutesById
 }
@@ -165,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GiftlogIndexRouteImport
       parentRoute: typeof GiftlogRoute
     }
+    '/giftlog/overview': {
+      id: '/giftlog/overview'
+      path: '/overview'
+      fullPath: '/giftlog/overview'
+      preLoaderRoute: typeof GiftlogOverviewRouteImport
+      parentRoute: typeof GiftlogRoute
+    }
     '/giftlog/history': {
       id: '/giftlog/history'
       path: '/history'
@@ -203,11 +222,13 @@ const EditRouteWithChildren = EditRoute._addFileChildren(EditRouteChildren)
 
 interface GiftlogRouteChildren {
   GiftlogHistoryRoute: typeof GiftlogHistoryRoute
+  GiftlogOverviewRoute: typeof GiftlogOverviewRoute
   GiftlogIndexRoute: typeof GiftlogIndexRoute
 }
 
 const GiftlogRouteChildren: GiftlogRouteChildren = {
   GiftlogHistoryRoute: GiftlogHistoryRoute,
+  GiftlogOverviewRoute: GiftlogOverviewRoute,
   GiftlogIndexRoute: GiftlogIndexRoute,
 }
 
