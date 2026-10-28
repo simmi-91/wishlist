@@ -32,7 +32,7 @@ const RootLayout = () => {
       <main className="app-shell">
         <Header />
 
-        <Container fluid className="content-scroll py-2">
+        <Container fluid className="py-2">
           <Outlet />
         </Container>
       </main>

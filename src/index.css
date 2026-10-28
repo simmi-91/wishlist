@@ -18,7 +18,6 @@ body {
     flex-direction: column;
     min-width: 320px;
     min-height: 100vh;
-    overflow: hidden;
 
     background: linear-gradient(135deg, #290101 0%, #520101 50%, #1a0000 100%);
     background-repeat: no-repeat;
@@ -26,16 +25,12 @@ body {
     background-size: cover;
     background-attachment: fixed;
 }
+/* The document itself scrolls (not an inner box), so mobile pull-to-refresh works.
+   The header stays on top with Bootstrap's sticky-top */
 main {
     flex: 1;
     display: flex;
     flex-direction: column;
-
-    height: 100vh;
-    overflow: hidden;
-}
-main > header {
-    flex-shrink: 0;
 }
 /* Smaller title on mobile; Bootstrap's fs-* utilities have no responsive variants.
    .navbar-brand too, since bootstrap.min.css is loaded after this file */
@@ -44,17 +39,11 @@ main > header {
         font-size: 1.1rem;
     }
 }
-.content-scroll {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-}
-
-/* Table header that stays visible while .content-scroll scrolls.
-   Negative top cancels the container's py-2 padding (__root.tsx) */
+/* Table header that stays visible right below the sticky page header while the page scrolls.
+   --header-height is measured by Header.tsx, since the header is lower on mobile and grows with the open menu */
 .sticky-head {
     position: sticky;
-    top: -0.5rem;
+    top: var(--header-height, 0px);
     z-index: 1;
 }
 

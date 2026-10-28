@@ -1,7 +1,7 @@
 import NavBarLinks from "./NavBarLinks";
 import AuthStatusDisplay from "../../auth/AuthStatusDisplay";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Container, Navbar, Nav } from "react-bootstrap";
 
@@ -10,8 +10,27 @@ const Header = () => {
     const [expanded, setExpanded] = useState(false);
     const closeMenu = () => setExpanded(false);
 
+    // Publishes the header's height as --header-height, so sticky table headers (.sticky-head)
+    // stop right below it. The height changes with screen size and when the mobile menu opens
+    const headerRef = useRef<HTMLElement>(null);
+    useLayoutEffect(() => {
+        const header = headerRef.current;
+        if (!header) {
+            return;
+        }
+        const root = document.documentElement;
+        const observer = new ResizeObserver(() => {
+            root.style.setProperty("--header-height", `${header.offsetHeight}px`);
+        });
+        observer.observe(header);
+        return () => {
+            observer.disconnect();
+            root.style.removeProperty("--header-height");
+        };
+    }, []);
+
     return (
-        <header className=" border-bottom border-secondary">
+        <header ref={headerRef} className="sticky-top border-bottom border-secondary">
             <Navbar
                 bg="dark"
                 variant="dark"
