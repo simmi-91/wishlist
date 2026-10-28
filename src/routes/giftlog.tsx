@@ -16,25 +16,26 @@ function GiftlogLayout() {
     return (
         // px-0: the root layout's fluid container already pads the sides; this one only limits the width
         <Container data-bs-theme="dark" className="px-0">
-            {/* Folder tabs: the active tab runs straight into the panel below */}
+            {/* Folder tabs: the active tab runs straight into the panel below. Never wrap to two lines:
+                equal widths on mobile, icons only on very narrow screens (index.css) */}
             <Nav variant="tabs" className="giftlog-tabs">
                 <Nav.Item>
                     {/* exact: otherwise this tab is active on /giftlog/history too */}
-                    <Link to="/giftlog" className="nav-link" activeOptions={{ exact: true }}>
+                    <Link to="/giftlog" className="nav-link" activeOptions={{ exact: true }} aria-label="Registrer">
                         <i className="bi bi-pencil-square me-1"></i>
-                        Registrer
+                        <span className="tab-label">Registrer</span>
                     </Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Link to="/giftlog/history" className="nav-link">
+                    <Link to="/giftlog/history" className="nav-link" aria-label="Historikk">
                         <i className="bi bi-search me-1"></i>
-                        Historikk
+                        <span className="tab-label">Historikk</span>
                     </Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Link to="/giftlog/overview" className="nav-link">
+                    <Link to="/giftlog/overview" className="nav-link" aria-label="Oversikt">
                         <i className="bi bi-bar-chart me-1"></i>
-                        Oversikt
+                        <span className="tab-label">Oversikt</span>
                     </Link>
                 </Nav.Item>
             </Nav>

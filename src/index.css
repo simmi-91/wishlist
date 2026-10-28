@@ -77,9 +77,35 @@ main {
     --bs-nav-link-color: rgba(var(--bs-emphasis-color-rgb), 0.7);
     --bs-nav-link-hover-color: var(--bs-emphasis-color);
     gap: 2px;
+    flex-wrap: nowrap;
 }
 .nav-tabs.giftlog-tabs .nav-link {
     background-color: rgba(var(--bs-body-bg-rgb), 0.45);
+    white-space: nowrap;
+}
+/* Mobile: the tabs share the width equally, with tighter text */
+@media (max-width: 767.98px) {
+    .nav-tabs.giftlog-tabs {
+        --bs-nav-link-padding-x: 0.25rem;
+        --bs-nav-link-font-size: 0.875rem;
+    }
+    .nav-tabs.giftlog-tabs .nav-item {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+    .nav-tabs.giftlog-tabs .nav-link {
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Too narrow for the labels: icons only (the links keep their aria-label) */
+@media (max-width: 349.98px) {
+    .giftlog-tabs .tab-label {
+        display: none;
+    }
+    .giftlog-tabs .nav-link .bi {
+        margin-right: 0 !important;
+    }
 }
 .tab-panel {
     padding: 0.75rem;
